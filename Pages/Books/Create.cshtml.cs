@@ -23,6 +23,8 @@ namespace Ropot_Anastasia_Lab2.Pages.Books
         {
             ViewData["PublisherID"] = new SelectList(_context.Set<Publisher>(), "ID", "PublisherName");
             return Page();
+            ViewData["AuthorID"] = new SelectList(_context.Set<Author>(), "ID", "FullName");
+            return Page();
         }
 
         [BindProperty]
