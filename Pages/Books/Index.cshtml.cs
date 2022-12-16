@@ -20,17 +20,48 @@ namespace Ropot_Anastasia_Lab2.Pages.Books
         }
 
         public IList<Book> Book { get;set; } = default!;
+        public BookData BookD { get; set; }
+        public string TitleSort { get; set; }
+        public string AuthorSort { get; set; }
+        public string CurrentFilter { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string sortOrder, string searchString)
         {
-            if (_context.Book != null)
+            BookD=new BookData()
+
+                //using System
+            TitleSort = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+            AuthorSort = String.IsNullOrEmpty(sortOrder) ? "author_desc" : "";
+            
+            CurrentFilter = searchString;
+
+            if (!String.IsNullOrEmpty(searchString))
             {
-                Book = await _context.Book
+                BookD.Books = BookD.Books.Where(s => s.Author.FirstName.Contains(searchString)
+
+               || s.Author.LastName.Contains(searchString)
+               || s.Title.Contains(searchString));
+            }
+
+            if (_context.Book != null)
+       
+                BookD.Books = await _context.Book
                     .Include(b=>b.Publisher)
                     .Include(b => b.Author)
+                    .OrderBy(b => b.Title)
                     .ToListAsync();
 
+            switch (sortOrder)
+                {
+                    case "title_desc":
+                        BookD.Books = BookD.Books.OrderByDescending(s => s.Title);
+                        break;
+                    case "author_desc":
+                        BookD.Books = BookD.Books.OrderByDescending(s => s.Author.FullName);
+                        break;
+                }
             }
         }
+
     }
 }
